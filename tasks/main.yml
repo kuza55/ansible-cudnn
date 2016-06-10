@@ -1,2 +1,82 @@
 ---
 # tasks file for ansible-cudnn
+
+    - name: Check if CUDA is installed
+      command: dpkg-query -W cuda
+      register: cuda_installed
+      failed_when: cuda_installed.rc > 1
+      changed_when: cuda_installed.rc == 1
+      
+    - name: Download CUDA
+      get_url: 
+        url="http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.5-18_amd64.deb"
+        dest="/tmp/cuda-repo-ubuntu1404_7.5-18_amd64.deb"
+      when: cuda_installed.rc == 1
+
+    - name: Install CUDA
+      apt: deb="/tmp/cuda-repo-ubuntu1404_7.5-18_amd64.deb"
+      when: cuda_installed.rc == 1
+      
+    - name: updates a server
+      apt: update_cache=yes
+      when: cuda_installed.rc == 1
+      
+    - name: register running kernel version
+      command: uname -r
+      register: running_kernel
+      changed_when: false
+      
+    - name: Install list of packages
+      apt: name={{item}} state=installed
+      with_items:
+        - opencl-headers
+        - build-essential
+        - protobuf-compiler
+        - libprotoc-dev
+        - libboost-all-dev
+        - libleveldb-dev
+        - hdf5-tools
+        - libhdf5-serial-dev
+        - libopencv-core-dev
+        - libopencv-highgui-dev
+        - libsnappy-dev
+        - libsnappy1
+        - libatlas-base-dev
+        - cmake
+        - libstdc++6-4.8-dbg
+        - libgoogle-glog0
+        - libgoogle-glog-dev
+        - libgflags-dev
+        - liblmdb-dev
+        - git
+        - python-pip
+        - gfortran
+        - "linux-image-extra-{{ running_kernel.stdout }}"
+        - "linux-headers-{{ running_kernel.stdout }}"
+        - "linux-image-{{ running_kernel.stdout }}"
+        - cuda
+
+    - file: path=/tmp/cudnn-7.0-linux-x64-v4.0-prod state=directory
+
+    - name: Download cuDNN
+      get_url:
+      args:
+        url: http://developer.download.nvidia.com/compute/redist/cudnn/v4/cudnn-7.0-linux-x64-v4.0-prod.tgz
+        dest: /tmp/cudnn-7.0-linux-x64-v4.0-prod.tgz
+        checksum: "sha1:a63cd90abf6a1c06cd26e769afdb770e85054b30"
+
+    - name: untar cuDNN
+      unarchive: src=/tmp/cudnn-7.0-linux-x64-v4.0-prod.tgz dest=/tmp/cudnn-7.0-linux-x64-v4.0-prod copy=no
+    
+    - name: Copy cuDNN headers from /tmp/cudnn-7.0-linux-x64-v4.0-prod
+      command: "cp /tmp/cudnn-7.0-linux-x64-v4.0-prod/cuda/include/cudnn.h /usr/local/cuda/include"
+      args:
+        creates: /usr/local/cuda/include/cudnn.h
+      
+    - name: Copy cuDNN libs from /tmp/cudnn-7.0-linux-x64-v4.0-prod
+      shell: "cp /tmp/cudnn-7.0-linux-x64-v4.0-prod/cuda/lib64/libcudnn* /usr/local/cuda/lib64/"
+      args:
+        creates: /usr/local/cuda/lib64/libcudnn.so.4
+      
+    - name: Set permissions on cuDNN files
+      shell: "chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*"
