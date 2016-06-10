@@ -23,7 +23,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - { role: kuza55.ansible-cudnn }
+        - role: kuza55.ansible-cudnn
 
 License
 -------
