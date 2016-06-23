@@ -48,8 +48,6 @@
         - libgoogle-glog-dev
         - libgflags-dev
         - liblmdb-dev
-        - git
-        - python-pip
         - gfortran
         - "linux-image-extra-{{ running_kernel.stdout }}"
         - "linux-headers-{{ running_kernel.stdout }}"
