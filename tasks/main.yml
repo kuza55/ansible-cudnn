@@ -54,27 +54,27 @@
         - "linux-image-{{ running_kernel.stdout }}"
         - cuda
 
-    - file: path=/tmp/cudnn-7.0-linux-x64-v4.0-prod state=directory
+    - file: path=/tmp/cudnn-7.5-linux-x64-v5.1 state=directory
 
     - name: Download cuDNN
       get_url:
       args:
-        url: http://developer.download.nvidia.com/compute/redist/cudnn/v4/cudnn-7.0-linux-x64-v4.0-prod.tgz
-        dest: /tmp/cudnn-7.0-linux-x64-v4.0-prod.tgz
-        checksum: "sha1:a63cd90abf6a1c06cd26e769afdb770e85054b30"
+        url: http://developer.download.nvidia.com/compute/redist/cudnn/v5.1/cudnn-7.5-linux-x64-v5.1.tgz
+        dest: /tmp/cudnn-7.5-linux-x64-v5.1.tgz
+        checksum: "sha1:193db99581428f6007fe7632bbb8e6c8da9b3c8a"
 
     - name: untar cuDNN
-      unarchive: src=/tmp/cudnn-7.0-linux-x64-v4.0-prod.tgz dest=/tmp/cudnn-7.0-linux-x64-v4.0-prod copy=no
+      unarchive: src=/tmp/cudnn-7.5-linux-x64-v5.1.tgz dest=/tmp/cudnn-7.5-linux-x64-v5.1 copy=no
     
-    - name: Copy cuDNN headers from /tmp/cudnn-7.0-linux-x64-v4.0-prod
-      command: "cp /tmp/cudnn-7.0-linux-x64-v4.0-prod/cuda/include/cudnn.h /usr/local/cuda/include"
+    - name: Copy cuDNN headers from /tmp/cudnn-7.5-linux-x64-v5.1
+      command: "cp /tmp/cudnn-7.5-linux-x64-v5.1/cuda/include/cudnn.h /usr/local/cuda/include"
       args:
         creates: /usr/local/cuda/include/cudnn.h
       
-    - name: Copy cuDNN libs from /tmp/cudnn-7.0-linux-x64-v4.0-prod
-      shell: "cp /tmp/cudnn-7.0-linux-x64-v4.0-prod/cuda/lib64/libcudnn* /usr/local/cuda/lib64/"
+    - name: Copy cuDNN libs from /tmp/cudnn-7.5-linux-x64-v5.1
+      shell: "cp /tmp/cudnn-7.5-linux-x64-v5.1/cuda/lib64/libcudnn* /usr/local/cuda/lib64/"
       args:
-        creates: /usr/local/cuda/lib64/libcudnn.so.4
+        creates: /usr/local/cuda/lib64/libcudnn.so.5
       
     - name: Set permissions on cuDNN files
       shell: "chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*"
