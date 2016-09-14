@@ -1,7 +1,7 @@
 cuDNN
 =========
 
-Ansible Role to install CUDA 7.5 and cuDNN 4.0 on Ubuntu
+Ansible Role to install CUDA 7.5 and cuDNN 5.1 on Ubuntu 14.04
 
 Requirements
 ------------
